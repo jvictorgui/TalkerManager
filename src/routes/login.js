@@ -6,7 +6,7 @@ loginRouter.post('/', (req, res) => {
     if (!email || !password) {
         return res.status(401).send('email ou senha invalidos');
     }
-    token = generateRandomToken(16);
+    const token = generateRandomToken(16);
     res.status(200).json({ token, message: 'Login efetuado com sucesso' });
 });
 
