@@ -1,7 +1,8 @@
 const loginRouter = require('express').Router();
 const generateRandomToken = require('../helpers/crypto');
+const validateFields = require('../middlewares/validateLoginFields');
 
-loginRouter.post('/', (req, res) => {
+loginRouter.post('/', validateFields, (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
         return res.status(401).send('email ou senha invalidos');
