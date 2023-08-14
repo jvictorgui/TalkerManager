@@ -1,6 +1,9 @@
 const talkerRouter = require('express').Router();
 const { readFile, findTalkerById } = require('../helpers/fsFuncs'); // Importa funções relacionadas à leitura e busca de palestrantes do arquivo JSON
 const validateID = require('../middlewares/validateId'); // Importa o middleware para validar IDs de palestrantes
+const validateTokenHeader = require('../middlewares/validateTokenHeader');
+const validateTalkerName = require('../middlewares/ValidateTalkerName');
+const validateTalkerAge = require('../middlewares/validateTalkerAge');
 
 // Rota para obter todos os palestrantes
 talkerRouter.get('/', async (req, res) => {
@@ -24,6 +27,24 @@ talkerRouter.get('/:id', validateID, async (req, res) => {
     } catch (err) {
         res.status(404).send({ message: 'Pessoa palestrante não encontrada' }); // Retorna um status 404 se o palestrante não for encontrado
     }
+});
+talkerRouter.post('/',
+validateTokenHeader,
+validateTalkerName,
+validateTalkerAge,
+    async (req, res) => {
+    const newTalker = {
+        id: req.body.id, 
+        name: req.body.name,
+        age: req.body.age,
+        talk: {
+            watchedAt: req.body.talk.watchedAt,
+            rate: req.body.talk.rate,
+        },
+        
+    };
+    const token = req.headers.authorization;
+    res.status(201).json({ newTalker, token });
 });
 
 module.exports = talkerRouter; 
