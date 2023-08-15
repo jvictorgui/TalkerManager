@@ -1,9 +1,12 @@
 const talkerRouter = require('express').Router();
-const { readFile, findTalkerById } = require('../helpers/fsFuncs'); // Importa funções relacionadas à leitura e busca de palestrantes do arquivo JSON
+const { readFile, findTalkerById, writeFile } = require('../helpers/fsFuncs'); // Importa funções relacionadas à leitura e busca de palestrantes do arquivo JSON
 const validateID = require('../middlewares/validateId'); // Importa o middleware para validar IDs de palestrantes
 const validateTokenHeader = require('../middlewares/validateTokenHeader');
 const validateTalkerName = require('../middlewares/ValidateTalkerName');
 const validateTalkerAge = require('../middlewares/validateTalkerAge');
+const validateTalkWatchedAt = require('../middlewares/validateTalkWatchedAt');
+const validateTalkRate = require('../middlewares/ValidateTalkRate');
+const validateTalkField = require('../middlewares/ValidateTalkField');
 
 // Rota para obter todos os palestrantes
 talkerRouter.get('/', async (req, res) => {
@@ -28,23 +31,22 @@ talkerRouter.get('/:id', validateID, async (req, res) => {
         res.status(404).send({ message: 'Pessoa palestrante não encontrada' }); // Retorna um status 404 se o palestrante não for encontrado
     }
 });
+
 talkerRouter.post('/',
-validateTokenHeader,
-validateTalkerName,
-validateTalkerAge,
+    validateTokenHeader,
+    validateTalkerName,
+    validateTalkerAge,
+    validateTalkField,
+    validateTalkWatchedAt,
+    validateTalkRate,
     async (req, res) => {
-    const newTalker = {
-        id: req.body.id, 
-        name: req.body.name,
-        age: req.body.age,
-        talk: {
-            watchedAt: req.body.talk.watchedAt,
-            rate: req.body.talk.rate,
-        },
-        
-    };
-    const token = req.headers.authorization;
-    res.status(201).json({ newTalker, token });
-});
+        try {
+            const { name, age, talk } = req.body; // Destruturação dos campos do corpo da solicitação
+            const newTalker = await writeFile({ name, age, talk }); // Chama a função writeFile para criar o novo palestrante
+            res.status(201).json(newTalker); // Responde com o status 201 (Created) e o novo palestrante criado
+        } catch (error) {
+            res.status(500).json({ message: error.message }); // Responde com o status 500 (Internal Server Error) e uma mensagem de erro
+        }
+    });
 
 module.exports = talkerRouter; 
