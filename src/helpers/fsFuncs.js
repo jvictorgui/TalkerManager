@@ -51,11 +51,22 @@ const updateTalker = async (id, updatedTalker) => {
     console.log(`Erro na atualização do arquivo: ${error}`);
   }
 };
+const deleteTalkerById = async (id) => {
+  try {
+      const talkerData = await readFile(); // Read the existing talker data from the file
+      const updatedTalkers = talkerData.filter((talker) => talker.id !== id); // Remove the talker with the specified ID
+      const updatedData = JSON.stringify(updatedTalkers, null, 2);
+      await fs.writeFile(JSONpath, updatedData); // Write the updated talker data back to the file
+  } catch (error) {
+      console.log(`Erro na exclusão do arquivo: ${error}`);
+  }
+};
 
 module.exports = {
     readFile,
     findTalkerById,
     writeFile,
     updateTalker,
+    deleteTalkerById,
     
 };

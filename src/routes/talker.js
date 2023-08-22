@@ -3,6 +3,7 @@ const { readFile,
      findTalkerById,
       writeFile,
       updateTalker,
+      deleteTalkerById,
      } = require('../helpers/fsFuncs'); // Importa funções relacionadas à leitura e busca de palestrantes do arquivo JSON
 const validateID = require('../middlewares/validateId'); // Importa o middleware para validar IDs de palestrantes
 const validateTokenHeader = require('../middlewares/validateTokenHeader');
@@ -67,6 +68,22 @@ talkerRouter.post('/',
             const { name, age, talk } = req.body;
             const updatedTalker = await updateTalker(Number(id), { name, age, talk });
       res.status(200).json(updatedTalker);
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
+    });
+
+    talkerRouter.delete('/:id', validateTokenHeader, async (req, res) => {
+        try {
+            const talkerId = parseInt(req.params.id, 10); // Parse the talker ID from the URL parameter
+            const talkerToDelete = await findTalkerById(talkerId); // Find the talker by ID
+    
+            if (!talkerToDelete) {
+                return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+            }
+    
+            await deleteTalkerById(talkerId); // Delete the talker based on the ID
+            res.status(204).json({ message: 'Pessoa palestrante excluída com sucesso' });
         } catch (err) {
             res.status(500).json({ message: err.message });
         }
