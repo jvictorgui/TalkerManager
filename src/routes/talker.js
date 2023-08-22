@@ -1,5 +1,9 @@
 const talkerRouter = require('express').Router();
-const { readFile, findTalkerById, writeFile } = require('../helpers/fsFuncs'); // Importa funções relacionadas à leitura e busca de palestrantes do arquivo JSON
+const { readFile,
+     findTalkerById,
+      writeFile,
+      updateTalker,
+     } = require('../helpers/fsFuncs'); // Importa funções relacionadas à leitura e busca de palestrantes do arquivo JSON
 const validateID = require('../middlewares/validateId'); // Importa o middleware para validar IDs de palestrantes
 const validateTokenHeader = require('../middlewares/validateTokenHeader');
 const validateTalkerName = require('../middlewares/ValidateTalkerName');
@@ -44,8 +48,27 @@ talkerRouter.post('/',
             const { name, age, talk } = req.body; // Destruturação dos campos do corpo da solicitação
             const newTalker = await writeFile({ name, age, talk }); // Chama a função writeFile para criar o novo palestrante
             res.status(201).json(newTalker); // Responde com o status 201 (Created) e o novo palestrante criado
-        } catch (error) {
-            res.status(500).json({ message: error.message }); // Responde com o status 500 (Internal Server Error) e uma mensagem de erro
+        } catch (err) {
+            res.status(500).json({ message: err.message }); // Responde com o status 500 (Internal Server Error) e uma mensagem de erro
+        }
+    });
+
+    talkerRouter.put('/:id',
+    validateTokenHeader,
+    validateID,
+    validateTalkerName,
+    validateTalkerAge,
+    validateTalkField,
+    validateTalkWatchedAt,
+    validateTalkRate,
+    async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { name, age, talk } = req.body;
+            const updatedTalker = await updateTalker(Number(id), { name, age, talk });
+      res.status(200).json(updatedTalker);
+        } catch (err) {
+            res.status(500).json({ message: err.message });
         }
     });
 

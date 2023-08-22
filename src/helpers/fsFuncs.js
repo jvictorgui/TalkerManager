@@ -34,8 +34,28 @@ const findTalkerById = async (id) => {
     return foundTalker; // Retorna o palestrante encontrado (ou undefined se não encontrado)
 };
 
+const updateTalker = async (id, updatedTalker) => {
+  try {
+    const oldTalk = await readFile();
+    const updateTalk = { id, ...updatedTalker };
+
+    const updatedTalkers = oldTalk.map((talker) => {
+      if (talker.id === id) return updateTalk;
+      return talker;
+    });
+
+    const updatedData = JSON.stringify(updatedTalkers, null, 2);
+    await fs.writeFile(JSONpath, updatedData);
+    return updateTalk;
+  } catch (error) {
+    console.log(`Erro na atualização do arquivo: ${error}`);
+  }
+};
+
 module.exports = {
     readFile,
     findTalkerById,
     writeFile,
+    updateTalker,
+    
 };

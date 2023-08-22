@@ -9,5 +9,5 @@ function generateRandomToken(length) {
     // o que resultava em tokens com o dobro do tamanho especificado.
     // Agora, cortando a string para o tamanho desejado para obter um token correto.
 }
-// console.log(generateRandomToken(16));
+console.log(generateRandomToken(16));
 module.exports = generateRandomToken;
