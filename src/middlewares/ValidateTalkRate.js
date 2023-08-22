@@ -24,4 +24,16 @@ const validateTalkRate = (req, res, next) => {
   next(); // Se a validação for bem-sucedida, passa para o próximo middleware ou rota
 };
 
-module.exports = validateTalkRate; // Exporta a função de validação da avaliação (rate) da palestra
+const validateRateQueryParam = (req, res, next) => {
+  const { rate } = req.query;
+  if (rate === undefined 
+    || (Number(rate) >= 1 && Number(rate) <= 5 && Number.isInteger(Number(rate)))) {
+    return next();
+  } 
+  
+  return res.status(400).json({ 
+    message: 'O campo "rate" deve ser um número inteiro entre 1 e 5',
+  });
+};
+
+module.exports = { validateTalkRate, validateRateQueryParam }; // Exporta a função de validação da avaliação (rate) da palestra

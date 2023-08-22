@@ -11,7 +11,7 @@ const validateTokenHeader = require('../middlewares/validateTokenHeader');
 const validateTalkerName = require('../middlewares/ValidateTalkerName');
 const validateTalkerAge = require('../middlewares/validateTalkerAge');
 const validateTalkWatchedAt = require('../middlewares/validateTalkWatchedAt');
-const validateTalkRate = require('../middlewares/ValidateTalkRate');
+const { validateTalkRate, validateRateQueryParam } = require('../middlewares/ValidateTalkRate');
 const validateTalkField = require('../middlewares/ValidateTalkField');
 
 // Rota para obter todos os palestrantes
@@ -28,13 +28,15 @@ talkerRouter.get('/', async (req, res) => {
 });
 
 talkerRouter.get('/search',
-validateTokenHeader,
-
+    validateTokenHeader,
+    validateRateQueryParam,
     async (req, res) => {
         try {
-            const { q } = req.query;
-            const talkerInfo = await findTalkerByName(q);
-            res.status(200).json(talkerInfo);
+            const { q, rate } = req.query;
+            
+            const filteredTalkers = await findTalkerByName(q, rate);
+            
+            res.status(200).json(filteredTalkers);
         } catch (err) {
             res.status(500).json({ message: err.message });
         }

@@ -62,9 +62,15 @@ const deleteTalkerById = async (id) => {
   }
 };
 
-const findTalkerByName = async (talkerName) => {
-  const talkerData = await readFile();
-  return talkerData.filter(({ name }) => name.toLowerCase().includes(talkerName.toLowerCase()));
+const findTalkerByName = async (q, rate) => {
+  let talkers = await readFile();
+  if (q) {
+    talkers = talkers.filter(({ name }) => name.toLowerCase().includes(q.toLowerCase()));
+  }
+  if (rate) {
+    return talkers.filter(({ talk }) => talk.rate === parseInt(rate, 10));
+  }
+  return talkers;
 };
 
 module.exports = {
