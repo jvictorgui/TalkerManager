@@ -62,11 +62,17 @@ const deleteTalkerById = async (id) => {
   }
 };
 
+const findTalkerByName = async (talkerName) => {
+  const talkerData = await readFile();
+  return talkerData.filter(({ name }) => name.toLowerCase().includes(talkerName.toLowerCase()));
+};
+
 module.exports = {
     readFile,
     findTalkerById,
     writeFile,
     updateTalker,
     deleteTalkerById,
+    findTalkerByName,
     
 };
