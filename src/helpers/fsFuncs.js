@@ -79,6 +79,36 @@ const findTalkerByName = async (querry) => {
   return talkers;
 };
 
+// fsFuncs.js
+
+// ...
+
+const updateTalkerRate = async (id, newRate) => {
+  try {
+      const talkerData = await readFile(); // Read the existing talker data from the file
+      const updatedTalkers = talkerData.map((talker) => {
+          if (talker.id === id) {
+              return {
+                  ...talker,
+                  talk: {
+                      ...talker.talk, rate: newRate,
+                  },
+              };
+          }
+          return talker;
+      });
+      const updatedData = JSON.stringify(updatedTalkers, null, 2);
+      await fs.writeFile(JSONpath, updatedData); // Write the updated talker data back to the file
+  } catch (error) {
+      console.log(`Erro na atualização do arquivo: ${error}`);
+  }
+};
+
+module.exports = {
+  // ...
+  updateTalkerRate,
+};
+
 module.exports = {
     readFile,
     findTalkerById,
@@ -86,5 +116,5 @@ module.exports = {
     updateTalker,
     deleteTalkerById,
     findTalkerByName,
-    
+    updateTalkerRate,
 };

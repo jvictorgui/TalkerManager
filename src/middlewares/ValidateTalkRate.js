@@ -1,11 +1,14 @@
 // Função para verificar se o valor da avaliação (rate) é válido
 const isRateValid = (rate) => {
   if (rate !== undefined) {
-      const isValid = (rate >= 1 && rate <= 5 && Number.isInteger(rate));
-      return isValid;
+    const isValid = (rate >= 1 && rate <= 5 && Number.isInteger(rate));
+    return isValid;
   }
   return false;
 };
+
+const isRateValidPatch = (rate) => 
+rate !== undefined && Number.isInteger(rate) && rate >= 1 && rate <= 5;
 
 // Middleware para validar a avaliação (rate) da palestra
 const validateTalkRate = (req, res, next) => {
@@ -36,4 +39,19 @@ const validateRateQueryParam = (req, res, next) => {
   });
 };
 
-module.exports = { validateTalkRate, validateRateQueryParam }; // Exporta a função de validação da avaliação (rate) da palestra
+const validateRatePatch = (req, res, next) => {
+  const { rate } = req.body;
+
+  if (rate === undefined || rate === '') {
+      return res.status(400).json({ message: 'O campo "rate" é obrigatório' });
+  }
+
+  if (!isRateValidPatch(rate)) {
+   return res.status(400).json({
+     message: 'O campo "rate" deve ser um número inteiro entre 1 e 5' });
+  }
+
+  next();
+};
+
+module.exports = { validateTalkRate, validateRateQueryParam, validateRatePatch }; // Exporta a função de validação da avaliação (rate) da palestra

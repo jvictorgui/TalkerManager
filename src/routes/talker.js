@@ -5,6 +5,7 @@ const { readFile,
       updateTalker,
       deleteTalkerById,
       findTalkerByName,
+      updateTalkerRate,
      } = require('../helpers/fsFuncs'); // Importa funções relacionadas à leitura e busca de palestrantes do arquivo JSON
 const validateID = require('../middlewares/validateId'); // Importa o middleware para validar IDs de palestrantes
 const validateTokenHeader = require('../middlewares/validateTokenHeader');
@@ -12,7 +13,9 @@ const validateTalkerName = require('../middlewares/ValidateTalkerName');
 const validateTalkerAge = require('../middlewares/validateTalkerAge');
 const { validateTalkWatchedAt,
      validateDateQuerry } = require('../middlewares/validateTalkWatchedAt');
-const { validateTalkRate, validateRateQueryParam } = require('../middlewares/ValidateTalkRate');
+const { validateTalkRate,
+     validateRateQueryParam,
+      validateRatePatch } = require('../middlewares/ValidateTalkRate');
 const validateTalkField = require('../middlewares/ValidateTalkField');
 
 // Rota para obter todos os palestrantes
@@ -27,28 +30,6 @@ talkerRouter.get('/', async (req, res) => {
         res.status(400).send({ message: err.message }); // Retorna um status 400 se ocorrer um erro
     }
 });
-
-// talkerRouter.get('/search',
-//     validateTokenHeader,
-//     validateRateQueryParam,
-//     validateDateQuerry,
-//     async (req, res) => {
-//         try {
-//             const { q, rate, date } = req.query;
-            
-//             let filteredTalkers = await findTalkerByName(q, rate);
-//             if (date) {
-//                 filteredTalkers = filteredTalkers.filter(({ talk }) => talk.watchedAt === date);
-//               }
-//               if (rate) {
-//          filteredTalkers = filteredTalkers.filter(({ talk }) => talk.rate === parseInt(rate, 10));
-//               }
-              
-//             res.status(200).json(filteredTalkers);
-//         } catch (err) {
-//             res.status(500).json({ message: err.message });
-//         }
-//     });
 
 talkerRouter.get('/search',
     validateTokenHeader,
@@ -122,6 +103,20 @@ talkerRouter.post('/',
     
             await deleteTalkerById(talkerId); // Delete the talker based on the ID
             res.status(204).json({ message: 'Pessoa palestrante excluída com sucesso' });
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
+    });
+
+    talkerRouter.patch('/rate/:id',
+    validateTokenHeader,
+    validateRatePatch,
+    async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { rate } = req.body;
+            await updateTalkerRate(Number(id), rate);
+            res.status(204).send();
         } catch (err) {
             res.status(500).json({ message: err.message });
         }
