@@ -62,14 +62,20 @@ const deleteTalkerById = async (id) => {
   }
 };
 
-const findTalkerByName = async (q, rate) => {
+const findTalkerByName = async (querry) => {
   let talkers = await readFile();
-  if (q) {
-    talkers = talkers.filter(({ name }) => name.toLowerCase().includes(q.toLowerCase()));
+  if (querry.q) {
+    talkers = talkers.filter(({ name }) => name.toLowerCase().includes(querry.q.toLowerCase()));
   }
-  if (rate) {
-    return talkers.filter(({ talk }) => talk.rate === parseInt(rate, 10));
+
+  if (querry.rate) {
+    talkers = talkers.filter(({ talk }) => talk.rate === Number(querry.rate));
   }
+
+  if (querry.date) {
+    talkers = talkers.filter(({ talk }) => talk.watchedAt === querry.date);
+  }
+
   return talkers;
 };
 

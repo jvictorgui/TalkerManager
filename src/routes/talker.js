@@ -10,7 +10,8 @@ const validateID = require('../middlewares/validateId'); // Importa o middleware
 const validateTokenHeader = require('../middlewares/validateTokenHeader');
 const validateTalkerName = require('../middlewares/ValidateTalkerName');
 const validateTalkerAge = require('../middlewares/validateTalkerAge');
-const validateTalkWatchedAt = require('../middlewares/validateTalkWatchedAt');
+const { validateTalkWatchedAt,
+     validateDateQuerry } = require('../middlewares/validateTalkWatchedAt');
 const { validateTalkRate, validateRateQueryParam } = require('../middlewares/ValidateTalkRate');
 const validateTalkField = require('../middlewares/ValidateTalkField');
 
@@ -27,16 +28,37 @@ talkerRouter.get('/', async (req, res) => {
     }
 });
 
+// talkerRouter.get('/search',
+//     validateTokenHeader,
+//     validateRateQueryParam,
+//     validateDateQuerry,
+//     async (req, res) => {
+//         try {
+//             const { q, rate, date } = req.query;
+            
+//             let filteredTalkers = await findTalkerByName(q, rate);
+//             if (date) {
+//                 filteredTalkers = filteredTalkers.filter(({ talk }) => talk.watchedAt === date);
+//               }
+//               if (rate) {
+//          filteredTalkers = filteredTalkers.filter(({ talk }) => talk.rate === parseInt(rate, 10));
+//               }
+              
+//             res.status(200).json(filteredTalkers);
+//         } catch (err) {
+//             res.status(500).json({ message: err.message });
+//         }
+//     });
+
 talkerRouter.get('/search',
     validateTokenHeader,
     validateRateQueryParam,
+    validateDateQuerry,
     async (req, res) => {
         try {
-            const { q, rate } = req.query;
+            const searchResult = await findTalkerByName(req.query);
             
-            const filteredTalkers = await findTalkerByName(q, rate);
-            
-            res.status(200).json(filteredTalkers);
+            res.status(200).json(searchResult);
         } catch (err) {
             res.status(500).json({ message: err.message });
         }

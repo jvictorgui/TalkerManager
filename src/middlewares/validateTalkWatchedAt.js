@@ -16,4 +16,18 @@ const validateTalkWatchedAt = (req, res, next) => {
     next(); // Se a validação for bem-sucedida, passa para o próximo middleware ou rota
 };
 
-module.exports = validateTalkWatchedAt; // Exporta a função de validação do campo "watchedAt" da palestra
+const validateDateQuerry = (req, res, next) => {
+    if (!req.query.date) return next();
+    const { date } = req.query;
+  
+    const regEx = /(0[1-9]|[12][0-9]|3[01])[ /.](0[1-9]|1[012])[ /.](19|20)\d\d/;
+  
+    if (!regEx.test(date)) {
+      return res.status(400).json({
+        message: 'O parâmetro "date" deve ter o formato "dd/mm/aaaa"',
+      });
+    }
+    next();
+  };
+
+module.exports = { validateTalkWatchedAt, validateDateQuerry }; // Exporta a função de validação do campo "watchedAt" da palestra
